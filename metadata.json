@@ -1,0 +1,7 @@
+{
+  "name": "SMC Alpha - AI Trading Analysis & Execution Platform",
+  "description": "Professional real-time AI trading platform with live market data, TradingView charting, Smart Money Concepts (BOS, CHoCH, Order Blocks, FVG), locked trade monitoring, paper & live execution, and TradingView webhooks.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
+

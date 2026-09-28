@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SMC Alpha - AI Trading Analysis &amp; Execution Platform</title>
+    <meta name="description" content="Professional real-time AI trading platform with live market data, TradingView charting, Smart Money Concepts (BOS, CHoCH, Order Blocks, FVG), locked trade monitoring, paper &amp; live execution, and TradingView webhooks." />
+    <meta property="og:title" content="SMC Alpha - AI Trading Analysis &amp; Execution Platform" />
+    <meta property="og:description" content="Professional real-time AI trading platform with live market data, TradingView charting, Smart Money Concepts (BOS, CHoCH, Order Blocks, FVG), locked trade monitoring, paper &amp; live execution, and TradingView webhooks." />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <script>
+      // Early guard against extension-injected errors like MetaMask in sandboxed iframes
+      window.addEventListener('error', function(e) {
+        var msg = (e && e.message) ? e.message : '';
+        if (msg.indexOf('MetaMask') !== -1 || msg.indexOf('ResizeObserver') !== -1 || msg.indexOf('ethereum') !== -1) {
+          if (e.stopImmediatePropagation) e.stopImmediatePropagation();
+          if (e.preventDefault) e.preventDefault();
+          return true;
+        }
+      }, true);
+      window.addEventListener('unhandledrejection', function(e) {
+        var reason = (e && e.reason) ? (e.reason.message || String(e.reason)) : '';
+        if (reason.indexOf('MetaMask') !== -1 || reason.indexOf('ResizeObserver') !== -1 || reason.indexOf('ethereum') !== -1) {
+          if (e.stopImmediatePropagation) e.stopImmediatePropagation();
+          if (e.preventDefault) e.preventDefault();
+        }
+      });
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
+
