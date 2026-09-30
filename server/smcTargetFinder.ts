@@ -35,13 +35,7 @@ export function findSMCLiquidityAndUnmitigatedTargets(
   tp3: SMCTakeProfitTarget;
   takeProfitThesis: string;
 } {
-  const isForex =
-    symbol === 'EURUSD' ||
-    symbol === 'GBPUSD' ||
-    symbol === 'AUDUSD' ||
-    symbol === 'USDCAD' ||
-    symbol === 'USDCHF' ||
-    symbol === 'NZDUSD';
+  const isForex = symbol === 'GBPUSD';
   const isJPY = symbol === 'USDJPY';
   const decimals = isForex ? 4 : isJPY ? 3 : 2;
   const risk = Math.abs(entryPrice - stopLoss) || (entryPrice * 0.005);

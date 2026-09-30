@@ -17,7 +17,7 @@ export interface MarketHoursStatus {
 /**
  * Institutional Market Hours Rule:
  * - BTCUSD operates 24/7 continuous crypto order flow without weekend shutdown.
- * - Traditional Assets (Forex: EURUSD, GBPUSD, USDJPY, AUDUSD, USDCAD, USDCHF, NZDUSD; Metals: XAUUSD; Indices: NAS100):
+ * - Traditional Assets (Forex: GBPUSD, USDJPY; Metals: XAUUSD; Indices: NAS100):
  *   Only trade Monday to Friday.
  *   - Close Friday at 21:00 UTC (17:00 EST / New York market close).
  *   - Closed Saturday all day.
@@ -25,8 +25,8 @@ export interface MarketHoursStatus {
  *   - Re-opens Sunday at 21:00 UTC.
  */
 export function getMarketHoursStatus(symbol: MarketSymbol, date: Date = new Date()): MarketHoursStatus {
-  // BTCUSD and ETHUSD trade 24/7 without weekend shutdown
-  if (symbol === 'BTCUSD' || symbol === 'ETHUSD') {
+  // BTCUSD trades 24/7 without weekend shutdown
+  if (symbol === 'BTCUSD') {
     return {
       symbol,
       isOpen: true,

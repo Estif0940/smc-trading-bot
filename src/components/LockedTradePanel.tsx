@@ -53,7 +53,7 @@ export const LockedTradePanel: React.FC<LockedTradePanelProps> = ({
   const lotSizeFormatted = (setup.lotSize || 0.1).toFixed(2);
   const brokerNameFormatted = activePosition.brokerName || 'Exness MT5 Real Gateway';
 
-  const isForex = setup.symbol === 'EURUSD' || setup.symbol === 'GBPUSD';
+  const isForex = setup.symbol === 'GBPUSD';
   const formatPrice = (p: number) => (isForex ? p.toFixed(4) : setup.symbol === 'XAUUSD' ? p.toFixed(2) : p.toFixed(2));
   const pipMultiplier = setup.symbol === 'XAUUSD' ? 0.1 : isForex ? 0.0001 : 1.0;
 

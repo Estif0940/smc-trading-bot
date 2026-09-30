@@ -54,15 +54,9 @@ export interface AutoTraderState {
 const DEFAULT_WATCHLIST: MarketSymbol[] = [
   'BTCUSD',
   'XAUUSD',
-  'EURUSD',
   'GBPUSD',
   'NAS100',
   'USDJPY',
-  'AUDUSD',
-  'USDCAD',
-  'USDCHF',
-  'NZDUSD',
-  'ETHUSD',
 ];
 
 let autoTraderState: AutoTraderState = {

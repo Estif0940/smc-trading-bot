@@ -17,7 +17,7 @@ interface SMCMatrixProps {
 }
 
 export const SMCMatrix: React.FC<SMCMatrixProps> = ({ zones, symbol }) => {
-  const isForex = symbol === 'EURUSD' || symbol === 'GBPUSD';
+  const isForex = symbol === 'GBPUSD';
   const formatPrice = (p: number) => (isForex ? p.toFixed(4) : symbol === 'XAUUSD' ? p.toFixed(2) : p.toFixed(2));
 
   return (

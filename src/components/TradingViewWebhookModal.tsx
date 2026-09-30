@@ -112,7 +112,7 @@ if (bearishBOS and strategy.position_size == 0)
               <input
                 type="text"
                 readOnly
-                value={webhookUrl}
+                value={webhookUrl ?? ''}
                 className="w-full bg-[#151b28] border border-slate-700 rounded px-3 py-2 text-white font-mono text-xs focus:outline-none"
               />
               <button

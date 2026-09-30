@@ -29,7 +29,7 @@ export const NativeCandlestickChart: React.FC<NativeCandlestickChartProps> = ({
   const [visibleCount, setVisibleCount] = useState<number>(60);
   const [offsetRight, setOffsetRight] = useState<number>(0);
 
-  const isForex = symbol === 'EURUSD' || symbol === 'GBPUSD';
+  const isForex = symbol === 'GBPUSD';
   const decimals = isForex ? 4 : 2;
 
   // Filter SMC zones

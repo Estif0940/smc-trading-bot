@@ -70,24 +70,33 @@ export const BrokerHubModal: React.FC<BrokerHubModalProps> = ({
   onUpdateOtherBroker,
   marketPrices,
 }) => {
-  if (!isOpen) return null;
-
   const [activeTab, setActiveTab] = useState<TabType>('exness');
   const [copiedCode, setCopiedCode] = useState(false);
   const [isTestingExness, setIsTestingExness] = useState(false);
   const [testSuccessMessage, setTestSuccessMessage] = useState<string | null>(null);
   const [testErrorMessage, setTestErrorMessage] = useState<string | null>(null);
 
-  // Form states for Exness
-  const [exnessAccount, setExnessAccount] = useState(brokerState.exness.accountNumber);
-  const [exnessServer, setExnessServer] = useState(brokerState.exness.server);
-  const [exnessAccountType, setExnessAccountType] = useState(brokerState.exness.accountType);
-  const [exnessSuffix, setExnessSuffix] = useState(brokerState.exness.symbolSuffix);
-  const [exnessPassword, setExnessPassword] = useState(brokerState.exness.tokenOrPassword);
+  // Form states for Exness (guaranteed non-undefined strings for controlled inputs)
+  const [exnessAccount, setExnessAccount] = useState<string>(brokerState?.exness?.accountNumber || '');
+  const [exnessServer, setExnessServer] = useState<string>(brokerState?.exness?.server || 'Exness-MT5Real');
+  const [exnessAccountType, setExnessAccountType] = useState<string>(brokerState?.exness?.accountType || 'standard');
+  const [exnessSuffix, setExnessSuffix] = useState<string>(brokerState?.exness?.symbolSuffix || '');
+  const [exnessPassword, setExnessPassword] = useState<string>(brokerState?.exness?.tokenOrPassword || '');
 
-  // Exness Full Server Directory Filter States
+  // Keep local state in sync when brokerState prop updates from backend
+  useEffect(() => {
+    if (brokerState?.exness) {
+      if (brokerState.exness.accountNumber !== undefined) setExnessAccount(brokerState.exness.accountNumber || '');
+      if (brokerState.exness.server !== undefined) setExnessServer(brokerState.exness.server || 'Exness-MT5Real');
+      if (brokerState.exness.accountType !== undefined) setExnessAccountType(brokerState.exness.accountType || 'standard');
+      if (brokerState.exness.symbolSuffix !== undefined) setExnessSuffix(brokerState.exness.symbolSuffix || '');
+      if (brokerState.exness.tokenOrPassword !== undefined) setExnessPassword(brokerState.exness.tokenOrPassword || '');
+    }
+  }, [brokerState?.exness]);
+
+  // Exness Full Server Directory Filter States (MetaTrader 5 Only)
   const [serverSearch, setServerSearch] = useState('');
-  const [serverFilterPlatform, setServerFilterPlatform] = useState<'ALL' | 'MT5' | 'MT4' | 'TRIAL'>('ALL');
+  const [serverFilterPlatform, setServerFilterPlatform] = useState<'ALL' | 'REAL' | 'TRIAL'>('ALL');
   const [customServerMode, setCustomServerMode] = useState(false);
 
   // Compute Active Exness Server Details
@@ -104,26 +113,32 @@ export const BrokerHubModal: React.FC<BrokerHubModalProps> = ({
     const matchesPlatform =
       serverFilterPlatform === 'ALL'
         ? true
-        : serverFilterPlatform === 'MT5'
-        ? s.platform === 'MT5' && s.type === 'REAL'
-        : serverFilterPlatform === 'MT4'
-        ? s.platform === 'MT4' && s.type === 'REAL'
+        : serverFilterPlatform === 'REAL'
+        ? s.type === 'REAL'
         : s.type === 'TRIAL';
 
     return matchesSearch && matchesPlatform;
   });
 
-  const mt5RealServers = filteredServers.filter((s) => s.platform === 'MT5' && s.type === 'REAL');
-  const mt4RealServers = filteredServers.filter((s) => s.platform === 'MT4' && s.type === 'REAL');
-  const mt5TrialServers = filteredServers.filter((s) => s.platform === 'MT5' && s.type === 'TRIAL');
-  const mt4TrialServers = filteredServers.filter((s) => s.platform === 'MT4' && s.type === 'TRIAL');
+  const mt5RealServers = filteredServers.filter((s) => s.type === 'REAL');
+  const mt5TrialServers = filteredServers.filter((s) => s.type === 'TRIAL');
 
-  // Broker Settings
-  const [autoTradeReal, setAutoTradeReal] = useState(brokerState.settings.autoTradeRealBrokers);
-  const [activeBroker, setActiveBroker] = useState<BrokerType | 'NONE'>(brokerState.settings.activeBroker);
-  const [maxLotSize, setMaxLotSize] = useState(brokerState.settings.maxLotSize);
-  const [maxSlippage, setMaxSlippage] = useState(brokerState.settings.maxSlippagePips);
-  const [autoBEAtRR, setAutoBEAtRR] = useState(brokerState.settings.autoMoveBreakevenAtRR);
+  // Broker Settings (guaranteed non-undefined numbers/booleans for controlled inputs)
+  const [autoTradeReal, setAutoTradeReal] = useState<boolean>(Boolean(brokerState?.settings?.autoTradeRealBrokers));
+  const [activeBroker, setActiveBroker] = useState<BrokerType | 'NONE'>(brokerState?.settings?.activeBroker || 'NONE');
+  const [maxLotSize, setMaxLotSize] = useState<number>(brokerState?.settings?.maxLotSize ?? 2.0);
+  const [maxSlippage, setMaxSlippage] = useState<number>(brokerState?.settings?.maxSlippagePips ?? 2.0);
+  const [autoBEAtRR, setAutoBEAtRR] = useState<number>(brokerState?.settings?.autoMoveBreakevenAtRR ?? 1.5);
+
+  useEffect(() => {
+    if (brokerState?.settings) {
+      if (brokerState.settings.autoTradeRealBrokers !== undefined) setAutoTradeReal(Boolean(brokerState.settings.autoTradeRealBrokers));
+      if (brokerState.settings.activeBroker !== undefined) setActiveBroker(brokerState.settings.activeBroker || 'NONE');
+      if (brokerState.settings.maxLotSize !== undefined) setMaxLotSize(brokerState.settings.maxLotSize ?? 2.0);
+      if (brokerState.settings.maxSlippagePips !== undefined) setMaxSlippage(brokerState.settings.maxSlippagePips ?? 2.0);
+      if (brokerState.settings.autoMoveBreakevenAtRR !== undefined) setAutoBEAtRR(brokerState.settings.autoMoveBreakevenAtRR ?? 1.5);
+    }
+  }, [brokerState?.settings]);
 
   const handleSaveSettings = (newActiveBroker?: BrokerType | 'NONE') => {
     const updated = {
@@ -220,14 +235,14 @@ export const BrokerHubModal: React.FC<BrokerHubModalProps> = ({
   const [metaMaskErrorMsg, setMetaMaskErrorMsg] = useState<string | null>(null);
   const [copiedAddress, setCopiedAddress] = useState(false);
 
-  const ethCurrentPrice = marketPrices?.ETHUSD?.price || 2650;
+  const btcCurrentPrice = marketPrices?.BTCUSD?.price || 89000;
 
   const handleConnectRealMetaMask = async () => {
     setIsConnectingMetaMask(true);
     setMetaMaskSuccessMsg(null);
     setMetaMaskErrorMsg(null);
     try {
-      const wallet = await connectMetaMaskWallet(ethCurrentPrice);
+      const wallet = await connectMetaMaskWallet(btcCurrentPrice);
       if (wallet.isConnected && wallet.address) {
         await onUpdateOtherBroker('METAMASK', {
           isConnected: true,
@@ -257,7 +272,7 @@ export const BrokerHubModal: React.FC<BrokerHubModalProps> = ({
     setMetaMaskSuccessMsg(null);
     setMetaMaskErrorMsg(null);
     try {
-      const demoWallet = getDemoMetaMaskWallet(ethCurrentPrice);
+      const demoWallet = getDemoMetaMaskWallet();
       await onUpdateOtherBroker('METAMASK', {
         isConnected: true,
         address: demoWallet.address,
@@ -315,6 +330,8 @@ export const BrokerHubModal: React.FC<BrokerHubModalProps> = ({
     setTimeout(() => setCopiedCode(false), 2500);
   };
 
+  if (!isOpen) return null;
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-200">
       <div className="bg-[#0b0f19] border border-[#1e293b] rounded-2xl max-w-4xl w-full p-5 sm:p-7 shadow-2xl relative max-h-[92vh] flex flex-col overflow-hidden">
@@ -338,11 +355,11 @@ export const BrokerHubModal: React.FC<BrokerHubModalProps> = ({
                   Real Broker Gateway &amp; Auto-Execution Hub
                 </h2>
                 <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-amber-500/15 text-amber-400 border border-amber-500/30">
-                  LIVE MT5 / MT4 / REST
+                  LIVE MT5 / REST
                 </span>
               </div>
               <p className="text-xs text-slate-400">
-                Connect real accounts (Exness, OANDA, cTrader, Prop Firms) and trade live accounts automatically.
+                Connect real accounts (Exness MT5, OANDA, cTrader, Prop Firms) and trade live accounts automatically.
               </p>
             </div>
           </div>
@@ -395,7 +412,7 @@ export const BrokerHubModal: React.FC<BrokerHubModalProps> = ({
                   : 'bg-slate-500'
               }`}
             />
-            <span>Exness (MT5 / MT4)</span>
+            <span>Exness (MetaTrader 5)</span>
             {brokerState.exness.isConnected && (
               <span className="text-[9px] px-1.5 py-0.2 rounded bg-emerald-500/20 text-emerald-300 font-mono">
                 CONNECTED
@@ -721,7 +738,7 @@ export const BrokerHubModal: React.FC<BrokerHubModalProps> = ({
                     <input
                       id="input-exness-account"
                       type="text"
-                      value={exnessAccount}
+                      value={exnessAccount ?? ''}
                       onChange={(e) => setExnessAccount(e.target.value)}
                       placeholder="e.g. 14829104"
                       className="w-full bg-[#090d16] border border-slate-800 rounded-lg px-3 py-2 text-xs text-white font-mono focus:outline-none focus:border-amber-500/60"
@@ -735,7 +752,7 @@ export const BrokerHubModal: React.FC<BrokerHubModalProps> = ({
                     <div className="flex gap-2">
                       <select
                         id="select-exness-type"
-                        value={exnessAccountType}
+                        value={exnessAccountType ?? 'standard'}
                         onChange={(e: any) => {
                           setExnessAccountType(e.target.value);
                           if (e.target.value === 'standard') setExnessSuffix('m');
@@ -752,7 +769,7 @@ export const BrokerHubModal: React.FC<BrokerHubModalProps> = ({
                       </select>
                       <input
                         type="text"
-                        value={exnessSuffix}
+                        value={exnessSuffix ?? ''}
                         onChange={(e) => setExnessSuffix(e.target.value)}
                         placeholder="Suffix"
                         className="w-1/3 bg-[#090d16] border border-slate-800 rounded-lg px-3 py-2 text-xs text-white font-mono text-center focus:outline-none focus:border-amber-500/60"
@@ -768,7 +785,7 @@ export const BrokerHubModal: React.FC<BrokerHubModalProps> = ({
                     <input
                       id="input-exness-password"
                       type="password"
-                      value={exnessPassword}
+                      value={exnessPassword ?? ''}
                       onChange={(e) => setExnessPassword(e.target.value)}
                       placeholder="••••••••••••"
                       className="w-full bg-[#090d16] border border-slate-800 rounded-lg px-3 py-2 text-xs text-white font-mono focus:outline-none focus:border-amber-500/60"
@@ -783,7 +800,7 @@ export const BrokerHubModal: React.FC<BrokerHubModalProps> = ({
                       <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse" />
                       <span className="text-xs font-bold text-slate-200 uppercase tracking-wider flex items-center gap-1.5">
                         <Server className="w-3.5 h-3.5 text-amber-400" />
-                        Exness Trading Server Directory ({ALL_EXNESS_SERVERS.length} Real Servers)
+                        Exness MetaTrader 5 Server Directory ({ALL_EXNESS_SERVERS.length} MT5 Servers)
                       </span>
                     </div>
 
@@ -798,29 +815,18 @@ export const BrokerHubModal: React.FC<BrokerHubModalProps> = ({
                             : 'bg-slate-800/60 text-slate-400 hover:text-slate-200'
                         }`}
                       >
-                        All ({ALL_EXNESS_SERVERS.length})
+                        All MT5 ({ALL_EXNESS_SERVERS.length})
                       </button>
                       <button
                         type="button"
-                        onClick={() => setServerFilterPlatform('MT5')}
+                        onClick={() => setServerFilterPlatform('REAL')}
                         className={`px-2 py-0.5 rounded transition-colors ${
-                          serverFilterPlatform === 'MT5'
+                          serverFilterPlatform === 'REAL'
                             ? 'bg-amber-500/30 text-amber-300 font-bold border border-amber-500/40'
                             : 'bg-slate-800/60 text-slate-400 hover:text-slate-200'
                         }`}
                       >
-                        MT5 Real (35)
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setServerFilterPlatform('MT4')}
-                        className={`px-2 py-0.5 rounded transition-colors ${
-                          serverFilterPlatform === 'MT4'
-                            ? 'bg-amber-500/30 text-amber-300 font-bold border border-amber-500/40'
-                            : 'bg-slate-800/60 text-slate-400 hover:text-slate-200'
-                        }`}
-                      >
-                        MT4 Real (36)
+                        MT5 Real ({mt5RealServers.length})
                       </button>
                       <button
                         type="button"
@@ -831,7 +837,7 @@ export const BrokerHubModal: React.FC<BrokerHubModalProps> = ({
                             : 'bg-slate-800/60 text-slate-400 hover:text-slate-200'
                         }`}
                       >
-                        Demo/Trial (16)
+                        MT5 Demo / Trial ({mt5TrialServers.length})
                       </button>
                       <button
                         type="button"
@@ -841,7 +847,7 @@ export const BrokerHubModal: React.FC<BrokerHubModalProps> = ({
                             ? 'bg-purple-500/30 text-purple-300 font-bold border border-purple-500/40'
                             : 'bg-slate-800/60 text-slate-400 hover:text-slate-200'
                         }`}
-                        title="Type custom or private server name"
+                        title="Type custom or private MT5 server name"
                       >
                         {customServerMode ? '✓ Custom Mode' : '✎ Type Custom'}
                       </button>
@@ -857,7 +863,7 @@ export const BrokerHubModal: React.FC<BrokerHubModalProps> = ({
                           <Search className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-2.5" />
                           <input
                             type="text"
-                            value={serverSearch}
+                            value={serverSearch ?? ''}
                             onChange={(e) => setServerSearch(e.target.value)}
                             placeholder="Filter by server # (e.g. 19, MT5Real, Real2)..."
                             className="w-full bg-[#070b12] border border-slate-800 rounded-lg pl-8 pr-3 py-1.5 text-xs text-white font-mono placeholder:text-slate-600 focus:outline-none focus:border-amber-500/60"
@@ -868,23 +874,13 @@ export const BrokerHubModal: React.FC<BrokerHubModalProps> = ({
                         <div className="sm:col-span-8">
                           <select
                             id="select-exness-server"
-                            value={exnessServer}
+                            value={exnessServer ?? 'Exness-MT5Real'}
                             onChange={(e) => setExnessServer(e.target.value)}
                             className="w-full bg-[#070b12] border border-slate-800 rounded-lg px-3 py-1.5 text-xs text-white font-mono focus:outline-none focus:border-amber-500/60"
                           >
                             {mt5RealServers.length > 0 && (
                               <optgroup label={`⚡ Exness MetaTrader 5 Real Servers (${mt5RealServers.length})`}>
                                 {mt5RealServers.map((s) => (
-                                  <option key={s.id} value={s.id}>
-                                    {s.id} — {s.datacenter} (~{s.approxPingMs}ms)
-                                  </option>
-                                ))}
-                              </optgroup>
-                            )}
-
-                            {mt4RealServers.length > 0 && (
-                              <optgroup label={`⚡ Exness MetaTrader 4 Real Servers (${mt4RealServers.length})`}>
-                                {mt4RealServers.map((s) => (
                                   <option key={s.id} value={s.id}>
                                     {s.id} — {s.datacenter} (~{s.approxPingMs}ms)
                                   </option>
@@ -901,16 +897,6 @@ export const BrokerHubModal: React.FC<BrokerHubModalProps> = ({
                                 ))}
                               </optgroup>
                             )}
-
-                            {mt4TrialServers.length > 0 && (
-                              <optgroup label={`🧪 Exness MetaTrader 4 Demo / Trial Servers (${mt4TrialServers.length})`}>
-                                {mt4TrialServers.map((s) => (
-                                  <option key={s.id} value={s.id}>
-                                    {s.id} — {s.datacenter} (~{s.approxPingMs}ms)
-                                  </option>
-                                ))}
-                              </optgroup>
-                            )}
                           </select>
                         </div>
                       </>
@@ -920,7 +906,7 @@ export const BrokerHubModal: React.FC<BrokerHubModalProps> = ({
                         <input
                           id="input-custom-exness-server"
                           type="text"
-                          value={exnessServer}
+                          value={exnessServer ?? ''}
                           onChange={(e) => setExnessServer(e.target.value)}
                           placeholder="Type exact Exness server (e.g. Exness-MT5Real19, Exness-Real25, or custom IP)"
                           className="w-full bg-[#070b12] border border-purple-500/50 rounded-lg px-3 py-1.5 text-xs text-white font-mono focus:outline-none focus:border-purple-400"
@@ -1022,7 +1008,7 @@ export const BrokerHubModal: React.FC<BrokerHubModalProps> = ({
                         step="0.1"
                         min="0.01"
                         max="10.0"
-                        value={maxLotSize}
+                        value={maxLotSize ?? 2.0}
                         onChange={(e) => setMaxLotSize(parseFloat(e.target.value) || 0.1)}
                         className="w-full bg-[#111624] border border-slate-700 rounded px-2.5 py-1 text-xs text-white font-mono"
                       />
@@ -1043,7 +1029,7 @@ export const BrokerHubModal: React.FC<BrokerHubModalProps> = ({
                         step="0.5"
                         min="0.5"
                         max="10.0"
-                        value={maxSlippage}
+                        value={maxSlippage ?? 2.0}
                         onChange={(e) => setMaxSlippage(parseFloat(e.target.value) || 2.0)}
                         className="w-full bg-[#111624] border border-slate-700 rounded px-2.5 py-1 text-xs text-white font-mono"
                       />
@@ -1064,7 +1050,7 @@ export const BrokerHubModal: React.FC<BrokerHubModalProps> = ({
                         step="0.1"
                         min="1.0"
                         max="5.0"
-                        value={autoBEAtRR}
+                        value={autoBEAtRR ?? 1.5}
                         onChange={(e) => setAutoBEAtRR(parseFloat(e.target.value) || 1.5)}
                         className="w-full bg-[#111624] border border-slate-700 rounded px-2.5 py-1 text-xs text-white font-mono"
                       />
@@ -1200,7 +1186,7 @@ export const BrokerHubModal: React.FC<BrokerHubModalProps> = ({
                     <div className="bg-[#090d16] p-2.5 rounded-lg border border-slate-800/80">
                       <span className="text-[10px] text-slate-400 font-mono block">ESTIMATED USD VALUE</span>
                       <span className="text-sm font-bold font-mono text-emerald-400">
-                        ${(brokerState.metaMask.balanceEth * ethCurrentPrice).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                        ${(brokerState.metaMask.balanceUsd || brokerState.metaMask.balanceEth * 2650).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                       </span>
                     </div>
 
@@ -1253,7 +1239,7 @@ export const BrokerHubModal: React.FC<BrokerHubModalProps> = ({
                       Browser Extension (MetaMask / EIP-1193)
                     </div>
                     <p className="text-xs text-slate-400 leading-relaxed">
-                      Connect your installed MetaMask browser extension. Trades on ETHUSD and BTCUSD will prompt for on-chain/contract sign-off.
+                      Connect your installed MetaMask browser extension. Trades on BTCUSD will prompt for on-chain/contract sign-off.
                     </p>
                   </div>
 
@@ -1327,10 +1313,10 @@ export const BrokerHubModal: React.FC<BrokerHubModalProps> = ({
                     <div className="flex items-center justify-between font-bold text-slate-200">
                       <span className="flex items-center gap-1.5">
                         <span className="w-2 h-2 rounded-full bg-blue-400" />
-                        ETHUSD &rarr; WETH / USDT
+                        BTCUSD &rarr; WBTC / USDT
                       </span>
                       <span className="text-emerald-400 font-bold">
-                        ${marketPrices?.ETHUSD?.price.toFixed(2) || '2,650.00'}
+                        ${marketPrices?.BTCUSD?.price.toFixed(2) || '89,450.00'}
                       </span>
                     </div>
                     <p className="text-[10px] text-slate-400 font-sans">
@@ -1411,7 +1397,7 @@ export const BrokerHubModal: React.FC<BrokerHubModalProps> = ({
                   Live OANDA Spreads &amp; Pricing
                 </h3>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs font-mono">
-                  {(['BTCUSD', 'NAS100', 'XAUUSD', 'EURUSD', 'GBPUSD', 'USDJPY', 'AUDUSD', 'USDCAD', 'USDCHF', 'NZDUSD', 'ETHUSD'] as MarketSymbol[]).map((sym) => {
+                  {(['BTCUSD', 'XAUUSD', 'GBPUSD', 'NAS100', 'USDJPY'] as MarketSymbol[]).map((sym) => {
                     const p = marketPrices[sym];
                     const bid = p?.bid ?? (p ? p.price * 0.9999 : 0);
                     const ask = p?.ask ?? (p ? p.price * 1.0001 : 0);
@@ -1420,14 +1406,14 @@ export const BrokerHubModal: React.FC<BrokerHubModalProps> = ({
                       <div key={sym} className="bg-[#090d16] p-3 rounded-lg border border-slate-800">
                         <div className="flex justify-between font-bold text-slate-200">
                           <span>{sym}</span>
-                          <span className="text-emerald-400">{p ? p.price.toFixed(sym.includes('USD') && !sym.includes('XAU') && !sym.includes('BTC') && !sym.includes('ETH') ? 4 : 2) : '---'}</span>
+                          <span className="text-emerald-400">{p ? p.price.toFixed(sym === 'GBPUSD' ? 4 : sym === 'USDJPY' ? 3 : 2) : '---'}</span>
                         </div>
                         <div className="flex justify-between text-[11px] text-slate-400 mt-1">
-                          <span>Bid: {bid.toFixed(sym.includes('USD') && !sym.includes('XAU') && !sym.includes('BTC') && !sym.includes('ETH') ? 4 : 2)}</span>
-                          <span>Ask: {ask.toFixed(sym.includes('USD') && !sym.includes('XAU') && !sym.includes('BTC') && !sym.includes('ETH') ? 4 : 2)}</span>
+                          <span>Bid: {bid.toFixed(sym === 'GBPUSD' ? 4 : sym === 'USDJPY' ? 3 : 2)}</span>
+                          <span>Ask: {ask.toFixed(sym === 'GBPUSD' ? 4 : sym === 'USDJPY' ? 3 : 2)}</span>
                         </div>
                         <div className="text-[10px] text-slate-500 mt-1">
-                          Spread: {(spread * (sym === 'XAUUSD' ? 10 : sym === 'EURUSD' || sym === 'GBPUSD' ? 10000 : 1)).toFixed(1)} pips
+                          Spread: {(spread * (sym === 'XAUUSD' ? 10 : sym === 'GBPUSD' ? 10000 : sym === 'USDJPY' ? 100 : 1)).toFixed(1)} pips
                         </div>
                       </div>
                     );
@@ -1539,10 +1525,10 @@ export const BrokerHubModal: React.FC<BrokerHubModalProps> = ({
                   <div>
                     <h3 className="text-sm font-bold text-slate-100 flex items-center gap-1.5">
                       <Terminal className="w-4 h-4 text-purple-400" />
-                      Exness MetaTrader 5 / MT4 Expert Advisor Script
+                      Exness MetaTrader 5 (MT5) Expert Advisor Script
                     </h3>
                     <p className="text-xs text-slate-400">
-                      Copy and compile this EA inside Exness MT5/MT4 to auto-execute every SMC signal directly.
+                      Copy and compile this EA inside Exness MT5 to auto-execute every SMC signal directly.
                     </p>
                   </div>
 

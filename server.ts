@@ -146,7 +146,7 @@ app.get('/api/broker/mql5-script', (req, res) => {
   res.json({ script, baseUrl });
 });
 
-// 1.7 Exness MetaTrader 5 / MT4 EA Signal Receptor & Heartbeat
+// 1.7 Exness MetaTrader 5 (MT5) EA Signal Receptor & Heartbeat
 app.get('/api/broker/ea-signal', (req, res) => {
   const account = req.query.account as string;
   const server = req.query.server as string | undefined;

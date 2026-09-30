@@ -52,16 +52,10 @@ interface HeaderProps {
 
 const SYMBOLS: { id: MarketSymbol; name: string; type: string; isCrypto247?: boolean }[] = [
   { id: 'BTCUSD', name: 'Bitcoin / USD', type: 'Crypto', isCrypto247: true },
-  { id: 'NAS100', name: 'Nasdaq 100 / USD', type: 'Index' },
   { id: 'XAUUSD', name: 'Gold / USD', type: 'Commodity' },
-  { id: 'EURUSD', name: 'Euro / USD', type: 'Forex' },
   { id: 'GBPUSD', name: 'British Pound / USD', type: 'Forex' },
+  { id: 'NAS100', name: 'Nasdaq 100 / USD', type: 'Index' },
   { id: 'USDJPY', name: 'USD / Japanese Yen', type: 'Forex' },
-  { id: 'AUDUSD', name: 'Australian Dollar / USD', type: 'Forex' },
-  { id: 'USDCAD', name: 'USD / Canadian Dollar', type: 'Forex' },
-  { id: 'USDCHF', name: 'USD / Swiss Franc', type: 'Forex' },
-  { id: 'NZDUSD', name: 'New Zealand Dollar / USD', type: 'Forex' },
-  { id: 'ETHUSD', name: 'Ethereum / USD', type: 'Crypto', isCrypto247: true },
 ];
 
 const TIMEFRAMES: { id: Timeframe; label: string; title: string }[] = [
@@ -216,7 +210,7 @@ export const Header: React.FC<HeaderProps> = ({
                         isSelected ? 'text-white font-medium' : posForSymbol ? 'text-amber-200 font-medium' : 'text-slate-500'
                       }`}
                     >
-                      {s.id === 'EURUSD' || s.id === 'GBPUSD' || s.id === 'AUDUSD' || s.id === 'USDCAD' || s.id === 'USDCHF' || s.id === 'NZDUSD'
+                      {s.id === 'GBPUSD'
                         ? symPrice.toFixed(4)
                         : s.id === 'USDJPY'
                         ? symPrice.toFixed(2)
@@ -262,7 +256,7 @@ export const Header: React.FC<HeaderProps> = ({
             <span
               className={`text-[9px] font-mono px-1.5 py-0.5 rounded font-bold border ${
                 getMarketHoursStatus(currentSymbol).isOpen
-                  ? currentSymbol === 'BTCUSD' || currentSymbol === 'ETHUSD'
+                  ? currentSymbol === 'BTCUSD'
                     ? 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30'
                     : 'bg-blue-500/15 text-blue-300 border-blue-500/30'
                   : 'bg-rose-500/15 text-rose-300 border-rose-500/30 animate-pulse'
@@ -283,12 +277,7 @@ export const Header: React.FC<HeaderProps> = ({
               }`}
             >
               <span>
-                {currentSymbol === 'EURUSD' ||
-                currentSymbol === 'GBPUSD' ||
-                currentSymbol === 'AUDUSD' ||
-                currentSymbol === 'USDCAD' ||
-                currentSymbol === 'USDCHF' ||
-                currentSymbol === 'NZDUSD'
+                {currentSymbol === 'GBPUSD'
                   ? price.toFixed(4)
                   : currentSymbol === 'USDJPY'
                   ? price.toFixed(3)

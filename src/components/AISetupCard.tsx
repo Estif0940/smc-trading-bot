@@ -59,13 +59,7 @@ export const AISetupCard: React.FC<AISetupCardProps> = ({
 
   const mtf = effectiveSetup?.multiTimeframe || multiTimeframe;
   const isLong = effectiveSetup?.direction === 'LONG';
-  const isForex =
-    effectiveSetup?.symbol === 'EURUSD' ||
-    effectiveSetup?.symbol === 'GBPUSD' ||
-    effectiveSetup?.symbol === 'AUDUSD' ||
-    effectiveSetup?.symbol === 'USDCAD' ||
-    effectiveSetup?.symbol === 'USDCHF' ||
-    effectiveSetup?.symbol === 'NZDUSD';
+  const isForex = effectiveSetup?.symbol === 'GBPUSD';
   const isJPY = effectiveSetup?.symbol === 'USDJPY';
   const formatPrice = (p: number) =>
     isForex

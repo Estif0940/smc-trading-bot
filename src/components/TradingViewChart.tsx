@@ -74,7 +74,7 @@ export const TradingViewChart: React.FC<TradingViewChartProps> = ({
   onTimeframeChange,
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
-  const [chartMode, setChartMode] = useState<'TV_DIRECT' | 'TV_WIDGET' | 'NATIVE_CANDLES'>('TV_DIRECT');
+  const [chartMode, setChartMode] = useState<'TV_WIDGET' | 'TV_DIRECT' | 'NATIVE_CANDLES'>('TV_WIDGET');
 
   // Map timeframe to TradingView interval format
   const getTVInterval = (tf: Timeframe): string => {
@@ -110,49 +110,43 @@ export const TradingViewChart: React.FC<TradingViewChartProps> = ({
     }
   };
 
-  // Map symbol to official live TradingView tickers
+  // Map symbol to official live TradingView tickers from OANDA live stream
   const getTVSymbol = (sym: MarketSymbol): string => {
     switch (sym) {
       case 'NAS100':
-        return 'NASDAQ:NDX';
+        return 'OANDA:NAS100USD';
       case 'BTCUSD':
-        return 'BINANCE:BTCUSDT';
-      case 'ETHUSD':
-        return 'BINANCE:ETHUSDT';
+        return 'OANDA:BTCUSD';
       case 'XAUUSD':
         return 'OANDA:XAUUSD';
-      case 'EURUSD':
-        return 'FX:EURUSD';
       case 'GBPUSD':
-        return 'FX:GBPUSD';
+        return 'OANDA:GBPUSD';
       case 'USDJPY':
-        return 'FX:USDJPY';
-      case 'AUDUSD':
-        return 'FX:AUDUSD';
-      case 'USDCAD':
-        return 'FX:USDCAD';
-      case 'USDCHF':
-        return 'FX:USDCHF';
-      case 'NZDUSD':
-        return 'FX:NZDUSD';
+        return 'OANDA:USDJPY';
       default:
-        return 'OANDA:XAUUSD';
+        return `OANDA:${sym}`;
     }
   };
 
   useEffect(() => {
     if (chartMode !== 'TV_WIDGET') return;
 
+    let isDisposed = false;
     const containerId = `tv_chart_container_${Math.random().toString(36).substring(2, 9)}`;
     if (containerRef.current) {
-      containerRef.current.innerHTML = `<div id="${containerId}" style="height: 100%; width: 100%;"></div>`;
+      containerRef.current.innerHTML = `<div id="${containerId}" style="height: 100%; width: 100%; min-height: 480px;"></div>`;
     }
 
     const scriptId = 'tradingview-widget-script';
     let script = document.getElementById(scriptId) as HTMLScriptElement | null;
 
     const initWidget = () => {
-      if ((window as any).TradingView && document.getElementById(containerId)) {
+      if (isDisposed) return;
+      if (!(window as any).TradingView) {
+        setTimeout(initWidget, 100);
+        return;
+      }
+      if (document.getElementById(containerId)) {
         new (window as any).TradingView.widget({
           autosize: true,
           symbol: getTVSymbol(symbol),
@@ -199,6 +193,10 @@ export const TradingViewChart: React.FC<TradingViewChartProps> = ({
     } else {
       initWidget();
     }
+
+    return () => {
+      isDisposed = true;
+    };
   }, [symbol, timeframe, chartMode]);
 
   // Extract key SMC highlights for chart HUD
@@ -212,7 +210,7 @@ export const TradingViewChart: React.FC<TradingViewChartProps> = ({
     activePositions?.find((p) => p.setup.symbol === symbol && p.setup.isLocked) ||
     (activePosition && activePosition.setup.symbol === symbol && activePosition.setup.isLocked ? activePosition : null);
   const hasActiveTrade = Boolean(currentSymbolPosition);
-  const isForex = symbol === 'EURUSD' || symbol === 'GBPUSD';
+  const isForex = symbol === 'GBPUSD';
   const decimals = isForex ? 5 : symbol === 'BTCUSD' ? 2 : 2;
   const pipMultiplier = symbol === 'XAUUSD' ? 0.1 : isForex ? 0.0001 : 1.0;
 
@@ -283,8 +281,21 @@ export const TradingViewChart: React.FC<TradingViewChartProps> = ({
         </div>
 
         <div className="flex items-center gap-2 text-[11px] text-slate-400 font-mono">
-          {/* Chart Engine Switcher: TradingView Direct (Interactive) vs OANDA Widget vs Native Candlestick Pro */}
+          {/* Chart Engine Switcher: TradingView OANDA vs Interactive SMC vs Native Candlestick Pro */}
           <div className="flex items-center rounded-lg bg-[#0b0e14] p-0.5 border border-slate-800">
+            <button
+              id="chart-mode-tv-widget-btn"
+              onClick={() => setChartMode('TV_WIDGET')}
+              className={`flex items-center gap-1.5 px-2.5 py-1 rounded text-[11px] font-semibold transition-all ${
+                chartMode === 'TV_WIDGET'
+                  ? 'bg-blue-600 text-white shadow-sm'
+                  : 'text-slate-400 hover:text-slate-200'
+              }`}
+              title="Official TradingView Chart extracted from OANDA live stream"
+            >
+              <Monitor className="w-3 h-3 text-blue-300" />
+              <span>TradingView (OANDA)</span>
+            </button>
             <button
               id="chart-mode-tv-direct-btn"
               onClick={() => setChartMode('TV_DIRECT')}
@@ -293,10 +304,9 @@ export const TradingViewChart: React.FC<TradingViewChartProps> = ({
                   ? 'bg-blue-600 text-white shadow-sm'
                   : 'text-slate-400 hover:text-slate-200'
               }`}
-              title="TradingView Interactive Chart with direct native Entry, SL, and TP lines"
+              title="Interactive TradingView Chart with direct Entry, SL, and TP lines"
             >
-              <Monitor className="w-3 h-3" />
-              <span>TradingView (Direct)</span>
+              <span>Interactive SMC</span>
             </button>
             <button
               id="chart-mode-pro-btn"
@@ -310,18 +320,6 @@ export const TradingViewChart: React.FC<TradingViewChartProps> = ({
             >
               <BarChart2 className="w-3 h-3" />
               <span>SMC Pro</span>
-            </button>
-            <button
-              id="chart-mode-tv-widget-btn"
-              onClick={() => setChartMode('TV_WIDGET')}
-              className={`flex items-center gap-1 px-2.5 py-1 rounded text-[11px] font-semibold transition-all ${
-                chartMode === 'TV_WIDGET'
-                  ? 'bg-blue-600 text-white shadow-sm'
-                  : 'text-slate-400 hover:text-slate-200'
-              }`}
-              title="Switch to external OANDA TradingView Iframe Widget"
-            >
-              <span>Widget</span>
             </button>
           </div>
 

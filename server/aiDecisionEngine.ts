@@ -343,13 +343,7 @@ export async function runAIDecisionEngine(
 
 
   // Compute realistic precision based on asset
-  const isForex =
-    symbol === 'EURUSD' ||
-    symbol === 'GBPUSD' ||
-    symbol === 'AUDUSD' ||
-    symbol === 'USDCAD' ||
-    symbol === 'USDCHF' ||
-    symbol === 'NZDUSD';
+  const isForex = symbol === 'GBPUSD';
   const isJPY = symbol === 'USDJPY';
   const isIndex = symbol === 'NAS100';
 

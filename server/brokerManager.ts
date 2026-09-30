@@ -615,7 +615,7 @@ export function updateOtherBrokerConfig(
     timestamp: Date.now(),
     broker: type === 'METAMASK' ? 'MetaMask Web3' : type,
     action: 'CONNECTION_TEST',
-    symbol: type === 'METAMASK' ? 'ETHUSD' : 'ALL',
+    symbol: type === 'METAMASK' ? 'BTCUSD' : 'ALL',
     details: `${type} configuration updated and connection tested.`,
     latencyMs: 18,
     status: 'SUCCESS',
@@ -649,7 +649,7 @@ export function updateMetaMaskWallet(config: Partial<MetaMaskWalletConfig>): {
     timestamp: Date.now(),
     broker: `MetaMask (${brokerState.metaMask.networkName})`,
     action: 'CONNECTION_TEST',
-    symbol: 'ETHUSD',
+    symbol: 'BTCUSD',
     ticketId: brokerState.metaMask.address ? `${brokerState.metaMask.address.slice(0, 8)}...` : 'WEB3_OK',
     details: `MetaMask wallet connected: ${brokerState.metaMask.address} (${brokerState.metaMask.balanceEth} ETH, $${brokerState.metaMask.balanceUsd}). Network: ${brokerState.metaMask.networkName}.`,
     latencyMs: 12,
@@ -686,7 +686,7 @@ export function disconnectMetaMaskWallet(): {
     timestamp: Date.now(),
     broker: 'MetaMask Web3',
     action: 'CONNECTION_TEST',
-    symbol: 'ETHUSD',
+    symbol: 'BTCUSD',
     ticketId: 'DISCONNECTED',
     details: 'MetaMask wallet disconnected by user.',
     latencyMs: 1,
@@ -703,7 +703,7 @@ export function disconnectMetaMaskWallet(): {
 
 /**
  * Helper to map symbol according to broker conventions
- * e.g. Exness often uses XAUUSDm, EURUSDm, GBPUSDm (Standard) or raw suffixes
+ * e.g. Exness often uses XAUUSDm, GBPUSDm, NAS100m, USDJPYm (Standard) or raw suffixes
  */
 export function getBrokerSymbol(symbol: MarketSymbol, broker: BrokerType): string {
   if (broker === 'EXNESS') {
@@ -711,21 +711,14 @@ export function getBrokerSymbol(symbol: MarketSymbol, broker: BrokerType): strin
     return `${symbol}${suffix}`;
   }
   if (broker === 'OANDA') {
-    if (symbol === 'XAUUSD') return 'XAU_USD';
-    if (symbol === 'EURUSD') return 'EUR_USD';
-    if (symbol === 'GBPUSD') return 'GBP_USD';
     if (symbol === 'BTCUSD') return 'BTC_USD';
-    if (symbol === 'ETHUSD') return 'ETH_USD';
+    if (symbol === 'XAUUSD') return 'XAU_USD';
+    if (symbol === 'GBPUSD') return 'GBP_USD';
     if (symbol === 'NAS100') return 'NAS100_USD';
     if (symbol === 'USDJPY') return 'USD_JPY';
-    if (symbol === 'AUDUSD') return 'AUD_USD';
-    if (symbol === 'USDCAD') return 'USD_CAD';
-    if (symbol === 'USDCHF') return 'USD_CHF';
-    if (symbol === 'NZDUSD') return 'NZD_USD';
     return symbol;
   }
   if (broker === 'METAMASK') {
-    if (symbol === 'ETHUSD') return 'WETH/USDT';
     if (symbol === 'BTCUSD') return 'WBTC/USDT';
     return symbol;
   }
@@ -771,8 +764,8 @@ export async function dispatchBrokerOrder(setup: TradeSetup): Promise<{
     brokerName = `Exness MT5 (${brokerState.exness.accountNumber})`;
     ticketId = `#EXN-${Math.floor(10000000 + Math.random() * 90000000)}`;
     // Realistic execution slippage within maxSlippagePips tolerance
-    const slippage = (Math.random() * 0.4 - 0.2) * (setup.symbol === 'EURUSD' || setup.symbol === 'GBPUSD' ? 0.0001 : 0.05);
-    fillPrice = parseFloat((setup.entryPrice + slippage).toFixed(setup.symbol === 'EURUSD' || setup.symbol === 'GBPUSD' ? 4 : 2));
+    const slippage = (Math.random() * 0.4 - 0.2) * (setup.symbol === 'GBPUSD' ? 0.0001 : 0.05);
+    fillPrice = parseFloat((setup.entryPrice + slippage).toFixed(setup.symbol === 'GBPUSD' ? 4 : 2));
 
     // Queue signal for Exness MT5 EA execution
     const signalId = `SIG_${Date.now()}_${Math.floor(1000 + Math.random() * 9000)}`;

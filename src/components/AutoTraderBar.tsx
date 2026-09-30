@@ -351,7 +351,7 @@ export const AutoTraderBar: React.FC<AutoTraderBarProps> = ({
           {/* Watchlist Scanner Chips with Cooldown & Active Trade Indicators */}
           <div className="flex items-center gap-1.5 shrink-0 flex-wrap">
             <span className="text-[10px] text-slate-400 uppercase hidden md:inline">Scanner Watchlist:</span>
-            {(['XAUUSD', 'BTCUSD', 'EURUSD', 'GBPUSD', 'ETHUSD'] as MarketSymbol[]).map((sym) => {
+            {(['BTCUSD', 'XAUUSD', 'GBPUSD', 'NAS100', 'USDJPY'] as MarketSymbol[]).map((sym) => {
               const isCurrentScan = isEnabled && scanningSymbol === sym;
               const isSelected = currentSymbol === sym;
               const cooldownUntil = autoTraderState?.activeAssetCooldowns?.[sym] || 0;
@@ -469,16 +469,10 @@ export const AutoTraderBar: React.FC<AutoTraderBarProps> = ({
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-2">
               {(autoTraderState?.watchlist || ([
                 'BTCUSD',
-                'NAS100',
                 'XAUUSD',
-                'EURUSD',
                 'GBPUSD',
+                'NAS100',
                 'USDJPY',
-                'AUDUSD',
-                'USDCAD',
-                'USDCHF',
-                'NZDUSD',
-                'ETHUSD',
               ] as MarketSymbol[])).map((sym) => {
                 const analysis = autoTraderState?.allAssetAnalyses?.[sym];
                 const setup = autoTraderState?.allAssetSetups?.[sym] || analysis?.setup;
@@ -487,13 +481,7 @@ export const AutoTraderBar: React.FC<AutoTraderBarProps> = ({
                 const marketHours = getMarketHoursStatus(sym);
                 const isClosed = !marketHours.isOpen;
 
-                const isForex =
-                  sym === 'EURUSD' ||
-                  sym === 'GBPUSD' ||
-                  sym === 'AUDUSD' ||
-                  sym === 'USDCAD' ||
-                  sym === 'USDCHF' ||
-                  sym === 'NZDUSD';
+                const isForex = sym === 'GBPUSD';
                 const isJPY = sym === 'USDJPY';
                 const decimals = isForex ? 4 : isJPY ? 3 : 2;
 
@@ -558,7 +546,7 @@ export const AutoTraderBar: React.FC<AutoTraderBarProps> = ({
                           <span className="text-[8px] font-semibold px-1 py-0.2 rounded bg-rose-500/15 text-rose-300 border border-rose-500/30">
                             CLOSED
                           </span>
-                        ) : sym === 'BTCUSD' || sym === 'ETHUSD' ? (
+                        ) : sym === 'BTCUSD' ? (
                           <span className="text-[8px] font-semibold px-1 py-0.2 rounded bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">
                             24/7
                           </span>

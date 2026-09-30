@@ -37,13 +37,7 @@ export const TradingViewDirectChart: React.FC<TradingViewDirectChartProps> = ({
   const volumeSeriesRef = useRef<ISeriesApi<'Histogram'> | null>(null);
   const priceLinesRef = useRef<IPriceLine[]>([]);
 
-  const isForex =
-    symbol === 'EURUSD' ||
-    symbol === 'GBPUSD' ||
-    symbol === 'AUDUSD' ||
-    symbol === 'USDCAD' ||
-    symbol === 'USDCHF' ||
-    symbol === 'NZDUSD';
+  const isForex = symbol === 'GBPUSD';
   const isJPY = symbol === 'USDJPY';
   const decimals = isForex ? 5 : isJPY ? 3 : 2;
   const minMove = isForex ? 0.00001 : isJPY ? 0.001 : 0.01;
@@ -335,6 +329,17 @@ export const TradingViewDirectChart: React.FC<TradingViewDirectChartProps> = ({
 
   return (
     <div className="relative w-full h-full min-h-[460px] bg-[#0b0e14] overflow-hidden select-none">
+      {/* OANDA TradingView Data Provider Badge */}
+      <div className="absolute top-2 left-3 z-10 flex items-center gap-1.5 pointer-events-none select-none">
+        <span className="text-[10px] font-mono font-bold text-slate-400 bg-[#0f1523]/90 px-2 py-0.5 rounded border border-slate-800 shadow-sm">
+          OANDA:{symbol}
+        </span>
+        <span className="text-[9px] font-mono text-emerald-400/90 bg-emerald-950/40 px-1.5 py-0.5 rounded border border-emerald-800/30 flex items-center gap-1">
+          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+          OANDA Feed
+        </span>
+      </div>
+
       <div ref={chartContainerRef} className="w-full h-full min-h-[460px]" />
     </div>
   );

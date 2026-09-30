@@ -88,7 +88,7 @@ export const OandaBrokerModal: React.FC<OandaBrokerModalProps> = ({
               <p className="text-slate-300 leading-relaxed">
                 {hasKey
                   ? `Connected to OANDA v20 ${env.toUpperCase()} environment. Candlesticks and live spreads are fetched directly from OANDA's institutional servers.`
-                  : 'The platform is currently rendering official OANDA feeds in the TradingView chart (OANDA:XAUUSD, OANDA:EURUSD, etc.) and synchronizing with real-time live market pricing. If you do not have an OANDA API key or Account ID, the system operates seamlessly with zero setup.'}
+                  : 'The platform is currently rendering official OANDA feeds in the TradingView chart (OANDA:BTCUSD, OANDA:XAUUSD, OANDA:GBPUSD, OANDA:NAS100USD, OANDA:USDJPY) and synchronizing with real-time live market pricing. If you do not have an OANDA API key or Account ID, the system operates seamlessly with zero setup.'}
               </p>
             </div>
           </div>
@@ -105,7 +105,7 @@ export const OandaBrokerModal: React.FC<OandaBrokerModalProps> = ({
               OANDA Broker Feeds
             </div>
             <p className="text-[11px] text-slate-500 mt-1">
-              Tickers: OANDA:XAUUSD, OANDA:EURUSD, OANDA:GBPUSD, OANDA:BTCUSD
+              Tickers: OANDA:BTCUSD, OANDA:XAUUSD, OANDA:GBPUSD, OANDA:NAS100USD, OANDA:USDJPY
             </p>
           </div>
 
@@ -142,28 +142,31 @@ export const OandaBrokerModal: React.FC<OandaBrokerModalProps> = ({
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-800/60 bg-[#0b0e14]">
-                {(['XAUUSD', 'EURUSD', 'GBPUSD', 'BTCUSD', 'ETHUSD'] as MarketSymbol[]).map(
+                {(['BTCUSD', 'XAUUSD', 'GBPUSD', 'NAS100', 'USDJPY'] as MarketSymbol[]).map(
                   (sym) => {
                     const data = marketPrices[sym];
-                    const tvTicker = `OANDA:${sym}`;
+                    const tvTicker = sym === 'NAS100' ? 'OANDA:NAS100USD' : `OANDA:${sym}`;
                     const bid = data?.bid ?? 0;
                     const ask = data?.ask ?? 0;
                     const spread = Math.abs(ask - bid);
-                    const isFx = sym === 'EURUSD' || sym === 'GBPUSD';
+                    const isFx = sym === 'GBPUSD';
+                    const isJpy = sym === 'USDJPY';
 
                     return (
                       <tr key={sym} className="hover:bg-slate-800/40 transition-colors">
                         <td className="py-2 px-3 font-bold text-slate-200">{sym}</td>
                         <td className="py-2 px-3 text-blue-400">{tvTicker}</td>
                         <td className="py-2 px-3 text-slate-300">
-                          {isFx ? bid.toFixed(4) : sym === 'XAUUSD' ? bid.toFixed(2) : bid.toFixed(0)}
+                          {isFx ? bid.toFixed(4) : isJpy ? bid.toFixed(2) : sym === 'XAUUSD' ? bid.toFixed(2) : bid.toFixed(0)}
                         </td>
                         <td className="py-2 px-3 text-slate-300">
-                          {isFx ? ask.toFixed(4) : sym === 'XAUUSD' ? ask.toFixed(2) : ask.toFixed(0)}
+                          {isFx ? ask.toFixed(4) : isJpy ? ask.toFixed(2) : sym === 'XAUUSD' ? ask.toFixed(2) : ask.toFixed(0)}
                         </td>
                         <td className="py-2 px-3 text-emerald-400 font-semibold">
                           {isFx
                             ? `${(spread * 10000).toFixed(1)} pips`
+                            : isJpy
+                            ? `${(spread * 100).toFixed(1)} pips`
                             : sym === 'XAUUSD'
                             ? `$${spread.toFixed(2)}`
                             : `$${spread.toFixed(0)}`}

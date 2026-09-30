@@ -19,17 +19,11 @@ let cachedAccountId: string | null = null;
 
 // Map internal symbols to OANDA v20 instrument format
 export const OANDA_INSTRUMENT_MAP: Record<MarketSymbol, string> = {
-  XAUUSD: 'XAU_USD',
-  EURUSD: 'EUR_USD',
-  GBPUSD: 'GBP_USD',
   BTCUSD: 'BTC_USD',
-  ETHUSD: 'ETH_USD',
+  XAUUSD: 'XAU_USD',
+  GBPUSD: 'GBP_USD',
   NAS100: 'NAS100_USD',
   USDJPY: 'USD_JPY',
-  AUDUSD: 'AUD_USD',
-  USDCAD: 'USD_CAD',
-  USDCHF: 'USD_CHF',
-  NZDUSD: 'NZD_USD',
 };
 
 // Map timeframes to OANDA granularity
@@ -69,7 +63,13 @@ export function getOandaStatus(): OandaConfigStatus {
     description: hasApiKey
       ? `OANDA v20 REST API connected (${environment.toUpperCase()})`
       : 'OANDA Broker Mode Active: TradingView OANDA Feed & Real-time Live Market Mirror (Zero API Key required)',
-    supportedSymbols: ['OANDA:XAUUSD', 'OANDA:EURUSD', 'OANDA:GBPUSD', 'OANDA:BTCUSD', 'OANDA:ETHUSD'],
+    supportedSymbols: [
+      'OANDA:BTCUSD',
+      'OANDA:XAUUSD',
+      'OANDA:GBPUSD',
+      'OANDA:NAS100USD',
+      'OANDA:USDJPY',
+    ],
     baseUrl,
     tradingViewPrefix: 'OANDA:',
   };
@@ -198,7 +198,7 @@ export async function fetchOandaPrices(): Promise<Partial<Record<MarketSymbol, M
     const accountId = await discoverAccountId(apiKey, baseUrl);
 
     if (accountId) {
-      const instruments = 'XAU_USD,EUR_USD,GBP_USD,BTC_USD,ETH_USD';
+      const instruments = 'BTC_USD,XAU_USD,GBP_USD,NAS100_USD,USD_JPY';
       const url = `${baseUrl}/accounts/${accountId}/pricing?instruments=${instruments}`;
       const res = await fetch(url, { headers: getHeaders(apiKey) });
 
@@ -227,14 +227,16 @@ export async function fetchOandaPrices(): Promise<Partial<Record<MarketSymbol, M
             const mid = (bid + ask) / 2;
 
             if (mid > 0) {
+              const isForex = sym === 'GBPUSD';
+              const dec = isForex ? 5 : sym === 'USDJPY' ? 3 : 2;
               priceResults[sym] = {
                 symbol: sym,
-                price: parseFloat(mid.toFixed(sym === 'EURUSD' || sym === 'GBPUSD' ? 4 : 2)),
-                bid: parseFloat(bid.toFixed(sym === 'EURUSD' || sym === 'GBPUSD' ? 4 : 2)),
-                ask: parseFloat(ask.toFixed(sym === 'EURUSD' || sym === 'GBPUSD' ? 4 : 2)),
-                high24h: parseFloat((mid * 1.008).toFixed(sym === 'EURUSD' || sym === 'GBPUSD' ? 4 : 2)),
-                low24h: parseFloat((mid * 0.992).toFixed(sym === 'EURUSD' || sym === 'GBPUSD' ? 4 : 2)),
-                change24h: parseFloat((mid * 0.0035).toFixed(sym === 'EURUSD' || sym === 'GBPUSD' ? 4 : 2)),
+                price: parseFloat(mid.toFixed(dec)),
+                bid: parseFloat(bid.toFixed(dec)),
+                ask: parseFloat(ask.toFixed(dec)),
+                high24h: parseFloat((mid * 1.008).toFixed(dec)),
+                low24h: parseFloat((mid * 0.992).toFixed(dec)),
+                change24h: parseFloat((mid * 0.0035).toFixed(dec)),
                 change24hPercent: 0.35,
                 timestamp: now,
                 source: `OANDA v20 Live Feed (${isLive ? 'Live' : 'Practice'})`,
@@ -252,7 +254,7 @@ export async function fetchOandaPrices(): Promise<Partial<Record<MarketSymbol, M
     // Fallback if account pricing endpoint didn't succeed: fetch latest 1 candle with price=BA (Bid/Ask)
     // This works without account ID!
     const singleResults: Partial<Record<MarketSymbol, MarketPriceData>> = {};
-    const symbolsToCheck: MarketSymbol[] = ['XAUUSD', 'EURUSD', 'GBPUSD'];
+    const symbolsToCheck: MarketSymbol[] = ['BTCUSD', 'XAUUSD', 'GBPUSD', 'NAS100', 'USDJPY'];
 
     for (const sym of symbolsToCheck) {
       const inst = OANDA_INSTRUMENT_MAP[sym];
@@ -267,7 +269,7 @@ export async function fetchOandaPrices(): Promise<Partial<Record<MarketSymbol, M
           const mid = (bid + ask) / 2;
           singleResults[sym] = {
             symbol: sym,
-            price: parseFloat(mid.toFixed(sym === 'EURUSD' || sym === 'GBPUSD' ? 4 : 2)),
+            price: parseFloat(mid.toFixed(sym === 'GBPUSD' ? 4 : sym === 'USDJPY' ? 3 : 2)),
             bid,
             ask,
             high24h: parseFloat(latest.ask.h),
@@ -285,7 +287,7 @@ export async function fetchOandaPrices(): Promise<Partial<Record<MarketSymbol, M
       return singleResults;
     }
   } catch {
-    // Silent fallback to Binance / FX feeds
+    // Silent fallback to TradingView / FX feeds
   }
 
   return null;

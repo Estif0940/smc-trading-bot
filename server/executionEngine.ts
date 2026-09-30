@@ -226,21 +226,14 @@ export function executeTrade(setupId: string, setupParam?: TradeSetup): { succes
   let lotMultiplier = 1;
   if (setupToExecute.symbol === 'XAUUSD') {
     lotMultiplier = 100; // 1 standard lot gold = 100 oz
-  } else if (
-    setupToExecute.symbol === 'EURUSD' ||
-    setupToExecute.symbol === 'GBPUSD' ||
-    setupToExecute.symbol === 'AUDUSD' ||
-    setupToExecute.symbol === 'USDCAD' ||
-    setupToExecute.symbol === 'USDCHF' ||
-    setupToExecute.symbol === 'NZDUSD'
-  ) {
+  } else if (setupToExecute.symbol === 'GBPUSD') {
     lotMultiplier = 100000; // 1 standard lot forex = 100k units
   } else if (setupToExecute.symbol === 'USDJPY') {
     lotMultiplier = 1000; // 1 standard lot USDJPY pip unit scaling
   } else if (setupToExecute.symbol === 'NAS100') {
     lotMultiplier = 20; // 1 standard lot NASDAQ 100 = 20 contracts
   } else {
-    lotMultiplier = 1; // 1 BTC / ETH
+    lotMultiplier = 1; // 1 BTC
   }
 
   let calculatedLot = riskAmount / (slDistance * lotMultiplier);
@@ -359,14 +352,7 @@ export function executeCustomTrade(params: {
   let lotMultiplier = 1;
   if (symbol === 'XAUUSD') {
     lotMultiplier = 100;
-  } else if (
-    symbol === 'EURUSD' ||
-    symbol === 'GBPUSD' ||
-    symbol === 'AUDUSD' ||
-    symbol === 'USDCAD' ||
-    symbol === 'USDCHF' ||
-    symbol === 'NZDUSD'
-  ) {
+  } else if (symbol === 'GBPUSD') {
     lotMultiplier = 100000;
   } else if (symbol === 'USDJPY') {
     lotMultiplier = 1000;
@@ -379,13 +365,7 @@ export function executeCustomTrade(params: {
   let calculatedLot = riskAmount / (slDistance * lotMultiplier);
   calculatedLot = Math.max(0.01, parseFloat(calculatedLot.toFixed(2)));
 
-  const isForex =
-    symbol === 'EURUSD' ||
-    symbol === 'GBPUSD' ||
-    symbol === 'AUDUSD' ||
-    symbol === 'USDCAD' ||
-    symbol === 'USDCHF' ||
-    symbol === 'NZDUSD';
+  const isForex = symbol === 'GBPUSD';
   const isJPY = symbol === 'USDJPY';
   const decimals = isForex ? 4 : isJPY ? 3 : 2;
 
@@ -495,7 +475,9 @@ export function updateActivePositionPrice(symbolPrices: Record<MarketSymbol, Mar
 
     let lotMultiplier = 1;
     if (symbol === 'XAUUSD') lotMultiplier = 100;
-    else if (symbol === 'EURUSD' || symbol === 'GBPUSD') lotMultiplier = 100000;
+    else if (symbol === 'GBPUSD') lotMultiplier = 100000;
+    else if (symbol === 'USDJPY') lotMultiplier = 1000;
+    else if (symbol === 'NAS100') lotMultiplier = 20;
 
     // Real-time P&L calculation
     let pnlPoints = 0;
@@ -564,7 +546,9 @@ export function closeActivePosition(
   const dir = trade.direction;
   let lotMultiplier = 1;
   if (trade.symbol === 'XAUUSD') lotMultiplier = 100;
-  else if (trade.symbol === 'EURUSD' || trade.symbol === 'GBPUSD') lotMultiplier = 100000;
+  else if (trade.symbol === 'GBPUSD') lotMultiplier = 100000;
+  else if (trade.symbol === 'USDJPY') lotMultiplier = 1000;
+  else if (trade.symbol === 'NAS100') lotMultiplier = 20;
 
   let pnlPoints = 0;
   if (dir === 'LONG') {

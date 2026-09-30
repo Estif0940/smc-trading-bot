@@ -55,17 +55,11 @@ export default function App() {
   const [currentTimeframe, setCurrentTimeframe] = useState<Timeframe>('15m');
 
   const [marketPrices, setMarketPrices] = useState<Record<MarketSymbol, MarketPriceData>>({
-    BTCUSD: { symbol: 'BTCUSD', price: 89450.00, bid: 89445.00, ask: 89455.00, high24h: 91200.00, low24h: 88100.00, change24h: 1350.00, change24hPercent: 1.53, timestamp: Date.now(), source: 'Binance 24/7 Live Stream' },
-    NAS100: { symbol: 'NAS100', price: 20340.50, bid: 20339.50, ask: 20341.50, high24h: 20490.00, low24h: 20210.00, change24h: 115.50, change24hPercent: 0.57, timestamp: Date.now(), source: 'NASDAQ 100 Live / OANDA' },
+    BTCUSD: { symbol: 'BTCUSD', price: 89450.00, bid: 89445.00, ask: 89455.00, high24h: 91200.00, low24h: 88100.00, change24h: 1350.00, change24hPercent: 1.53, timestamp: Date.now(), source: 'OANDA / TradingView Live Stream' },
     XAUUSD: { symbol: 'XAUUSD', price: 3512.45, bid: 3512.20, ask: 3512.70, high24h: 3528.80, low24h: 3494.10, change24h: 18.35, change24hPercent: 0.52, timestamp: Date.now(), source: 'OANDA / Live Gold Spot' },
-    EURUSD: { symbol: 'EURUSD', price: 1.0542, bid: 1.0541, ask: 1.0543, high24h: 1.0585, low24h: 1.0512, change24h: 0.0030, change24hPercent: 0.28, timestamp: Date.now(), source: 'Interbank Forex Live' },
     GBPUSD: { symbol: 'GBPUSD', price: 1.2685, bid: 1.2684, ask: 1.2686, high24h: 1.2740, low24h: 1.2635, change24h: 0.0050, change24hPercent: 0.39, timestamp: Date.now(), source: 'Interbank Forex Live' },
+    NAS100: { symbol: 'NAS100', price: 20340.50, bid: 20339.50, ask: 20341.50, high24h: 20490.00, low24h: 20210.00, change24h: 115.50, change24hPercent: 0.57, timestamp: Date.now(), source: 'NASDAQ 100 Live / OANDA' },
     USDJPY: { symbol: 'USDJPY', price: 153.85, bid: 153.84, ask: 153.86, high24h: 154.50, low24h: 153.20, change24h: 0.45, change24hPercent: 0.29, timestamp: Date.now(), source: 'Interbank Forex Live' },
-    AUDUSD: { symbol: 'AUDUSD', price: 0.6545, bid: 0.6544, ask: 0.6546, high24h: 0.6580, low24h: 0.6515, change24h: 0.0018, change24hPercent: 0.28, timestamp: Date.now(), source: 'Interbank Forex Live' },
-    USDCAD: { symbol: 'USDCAD', price: 1.3985, bid: 1.3984, ask: 1.3986, high24h: 1.4020, low24h: 1.3945, change24h: -0.0022, change24hPercent: -0.16, timestamp: Date.now(), source: 'Interbank Forex Live' },
-    USDCHF: { symbol: 'USDCHF', price: 0.8872, bid: 0.8871, ask: 0.8873, high24h: 0.8910, low24h: 0.8845, change24h: -0.0015, change24hPercent: -0.17, timestamp: Date.now(), source: 'Interbank Forex Live' },
-    NZDUSD: { symbol: 'NZDUSD', price: 0.5895, bid: 0.5894, ask: 0.5896, high24h: 0.5930, low24h: 0.5865, change24h: 0.0020, change24hPercent: 0.34, timestamp: Date.now(), source: 'Interbank Forex Live' },
-    ETHUSD: { symbol: 'ETHUSD', price: 2680.50, bid: 2680.20, ask: 2680.80, high24h: 2740.00, low24h: 2615.00, change24h: 65.50, change24hPercent: 2.50, timestamp: Date.now(), source: 'Binance 24/7 Live Stream' },
   });
 
   const [candles, setCandles] = useState<CandleData[]>([]);
@@ -141,6 +135,7 @@ export default function App() {
       serverLocation: 'London LD4 Equinix',
       accountType: 'standard',
       symbolSuffix: 'm',
+      tokenOrPassword: '',
       isConnected: true,
       lastPingMs: 24,
       balance: 10450.0,

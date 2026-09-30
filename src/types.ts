@@ -1,15 +1,9 @@
 export type MarketSymbol =
-  | 'XAUUSD'
   | 'BTCUSD'
-  | 'ETHUSD'
-  | 'EURUSD'
+  | 'XAUUSD'
   | 'GBPUSD'
   | 'NAS100'
-  | 'USDJPY'
-  | 'AUDUSD'
-  | 'USDCAD'
-  | 'USDCHF'
-  | 'NZDUSD';
+  | 'USDJPY';
 
 export type Timeframe =
   | '1m'

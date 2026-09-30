@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   AlertTriangle,
   CheckCircle2,
@@ -27,11 +27,20 @@ export const RiskManagementModal: React.FC<RiskManagementModalProps> = ({
   onSaveRiskSettings,
   onResetPaperAccount,
 }) => {
-  const [balance, setBalance] = useState(riskSettings.accountBalance);
-  const [maxRiskPercent, setMaxRiskPercent] = useState(riskSettings.maxRiskPerTradePercent);
-  const [maxDailyLoss, setMaxDailyLoss] = useState(riskSettings.maxDailyLossPercent);
-  const [leverage, setLeverage] = useState(riskSettings.leverage);
+  const [balance, setBalance] = useState<number>(riskSettings?.accountBalance ?? 50000);
+  const [maxRiskPercent, setMaxRiskPercent] = useState<number>(riskSettings?.maxRiskPerTradePercent ?? 1.0);
+  const [maxDailyLoss, setMaxDailyLoss] = useState<number>(riskSettings?.maxDailyLossPercent ?? 3.0);
+  const [leverage, setLeverage] = useState<number>(riskSettings?.leverage ?? 100);
   const [savedSuccess, setSavedSuccess] = useState(false);
+
+  useEffect(() => {
+    if (riskSettings) {
+      if (riskSettings.accountBalance !== undefined) setBalance(riskSettings.accountBalance ?? 50000);
+      if (riskSettings.maxRiskPerTradePercent !== undefined) setMaxRiskPercent(riskSettings.maxRiskPerTradePercent ?? 1.0);
+      if (riskSettings.maxDailyLossPercent !== undefined) setMaxDailyLoss(riskSettings.maxDailyLossPercent ?? 3.0);
+      if (riskSettings.leverage !== undefined) setLeverage(riskSettings.leverage ?? 100);
+    }
+  }, [riskSettings]);
 
   if (!isOpen) return null;
 
@@ -83,7 +92,7 @@ export const RiskManagementModal: React.FC<RiskManagementModalProps> = ({
             <div className="flex items-center gap-2">
               <input
                 type="number"
-                value={balance}
+                value={balance ?? 0}
                 onChange={(e) => setBalance(parseFloat(e.target.value) || 0)}
                 className="w-full bg-[#151b28] border border-slate-700 rounded px-3 py-2 text-white font-mono focus:outline-none focus:border-blue-500"
               />
@@ -110,7 +119,7 @@ export const RiskManagementModal: React.FC<RiskManagementModalProps> = ({
               min="0.25"
               max="3.0"
               step="0.25"
-              value={maxRiskPercent}
+              value={maxRiskPercent ?? 1.0}
               onChange={(e) => setMaxRiskPercent(parseFloat(e.target.value))}
               className="w-full accent-blue-500"
             />
@@ -134,7 +143,7 @@ export const RiskManagementModal: React.FC<RiskManagementModalProps> = ({
               min="1.0"
               max="6.0"
               step="0.5"
-              value={maxDailyLoss}
+              value={maxDailyLoss ?? 3.0}
               onChange={(e) => setMaxDailyLoss(parseFloat(e.target.value))}
               className="w-full accent-rose-500"
             />

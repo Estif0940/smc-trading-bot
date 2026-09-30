@@ -4,6 +4,18 @@ import { getMarketHoursStatus, isMarketOpen } from '../src/utils/marketHours.js'
 
 // Cache for live market prices
 const priceCache: Record<MarketSymbol, MarketPriceData> = {
+  BTCUSD: {
+    symbol: 'BTCUSD',
+    price: 89450.00,
+    bid: 89445.00,
+    ask: 89455.00,
+    high24h: 91200.00,
+    low24h: 88100.00,
+    change24h: 1350.00,
+    change24hPercent: 1.53,
+    timestamp: Date.now(),
+    source: 'OANDA / TradingView Live Stream',
+  },
   XAUUSD: {
     symbol: 'XAUUSD',
     price: 3512.45,
@@ -15,42 +27,6 @@ const priceCache: Record<MarketSymbol, MarketPriceData> = {
     change24hPercent: 0.52,
     timestamp: Date.now(),
     source: 'OANDA / Live Gold Spot',
-  },
-  BTCUSD: {
-    symbol: 'BTCUSD',
-    price: 89450.00,
-    bid: 89445.00,
-    ask: 89455.00,
-    high24h: 91200.00,
-    low24h: 88100.00,
-    change24h: 1350.00,
-    change24hPercent: 1.53,
-    timestamp: Date.now(),
-    source: 'Binance 24/7 Live Stream',
-  },
-  ETHUSD: {
-    symbol: 'ETHUSD',
-    price: 2680.50,
-    bid: 2680.20,
-    ask: 2680.80,
-    high24h: 2740.00,
-    low24h: 2615.00,
-    change24h: 65.50,
-    change24hPercent: 2.50,
-    timestamp: Date.now(),
-    source: 'Binance 24/7 Live Stream',
-  },
-  EURUSD: {
-    symbol: 'EURUSD',
-    price: 1.0542,
-    bid: 1.0541,
-    ask: 1.0543,
-    high24h: 1.0585,
-    low24h: 1.0512,
-    change24h: 0.0030,
-    change24hPercent: 0.28,
-    timestamp: Date.now(),
-    source: 'Interbank Forex Live',
   },
   GBPUSD: {
     symbol: 'GBPUSD',
@@ -88,69 +64,15 @@ const priceCache: Record<MarketSymbol, MarketPriceData> = {
     timestamp: Date.now(),
     source: 'Interbank Forex Live',
   },
-  AUDUSD: {
-    symbol: 'AUDUSD',
-    price: 0.6545,
-    bid: 0.6544,
-    ask: 0.6546,
-    high24h: 0.6580,
-    low24h: 0.6515,
-    change24h: 0.0018,
-    change24hPercent: 0.28,
-    timestamp: Date.now(),
-    source: 'Interbank Forex Live',
-  },
-  USDCAD: {
-    symbol: 'USDCAD',
-    price: 1.3985,
-    bid: 1.3984,
-    ask: 1.3986,
-    high24h: 1.4020,
-    low24h: 1.3945,
-    change24h: -0.0022,
-    change24hPercent: -0.16,
-    timestamp: Date.now(),
-    source: 'Interbank Forex Live',
-  },
-  USDCHF: {
-    symbol: 'USDCHF',
-    price: 0.8872,
-    bid: 0.8871,
-    ask: 0.8873,
-    high24h: 0.8910,
-    low24h: 0.8845,
-    change24h: -0.0015,
-    change24hPercent: -0.17,
-    timestamp: Date.now(),
-    source: 'Interbank Forex Live',
-  },
-  NZDUSD: {
-    symbol: 'NZDUSD',
-    price: 0.5895,
-    bid: 0.5894,
-    ask: 0.5896,
-    high24h: 0.5930,
-    low24h: 0.5865,
-    change24h: 0.0020,
-    change24hPercent: 0.34,
-    timestamp: Date.now(),
-    source: 'Interbank Forex Live',
-  },
 };
 
 // Anchor prices to keep micro-ticks tethered to true market reality
 const anchorPrices: Record<MarketSymbol, number> = {
-  XAUUSD: 3512.45,
   BTCUSD: 89450.00,
-  ETHUSD: 2680.50,
-  EURUSD: 1.0542,
+  XAUUSD: 3512.45,
   GBPUSD: 1.2685,
   NAS100: 20340.50,
   USDJPY: 153.85,
-  AUDUSD: 0.6545,
-  USDCAD: 1.3985,
-  USDCHF: 0.8872,
-  NZDUSD: 0.5895,
 };
 
 // Candle cache
@@ -168,17 +90,11 @@ let isFetchingExternal = false;
  */
 export function generateRealisticMicroTicks(): Record<MarketSymbol, MarketPriceData> {
   const symbols: MarketSymbol[] = [
-    'XAUUSD',
     'BTCUSD',
-    'ETHUSD',
-    'EURUSD',
+    'XAUUSD',
     'GBPUSD',
     'NAS100',
     'USDJPY',
-    'AUDUSD',
-    'USDCAD',
-    'USDCHF',
-    'NZDUSD',
   ];
 
   const now = new Date();
@@ -221,12 +137,6 @@ export function generateRealisticMicroTicks(): Record<MarketSymbol, MarketPriceD
       const drift = (anchor - current.price) * 0.07;
       const noise = (Math.random() - 0.495) * 14.5;
       step = parseFloat((drift + noise).toFixed(2));
-    } else if (sym === 'ETHUSD') {
-      precision = 2;
-      spread = 0.35 + Math.random() * 0.35;
-      const drift = (anchor - current.price) * 0.07;
-      const noise = (Math.random() - 0.495) * 0.85;
-      step = parseFloat((drift + noise).toFixed(2));
     } else if (sym === 'NAS100') {
       precision = 2;
       spread = 1.0 + Math.random() * 1.0;
@@ -240,7 +150,7 @@ export function generateRealisticMicroTicks(): Record<MarketSymbol, MarketPriceD
       const noise = (Math.random() - 0.495) * 0.02;
       step = parseFloat((drift + noise).toFixed(3));
     } else {
-      // Standard Forex pairs (EURUSD, GBPUSD, AUDUSD, USDCAD, USDCHF, NZDUSD)
+      // Forex pair (GBPUSD)
       precision = 4;
       spread = 0.00010 + Math.random() * 0.00006;
       const drift = (anchor - current.price) * 0.08;
@@ -284,7 +194,7 @@ function updateCachedCandlesWithTick(symbol: MarketSymbol, price: number) {
 }
 
 /**
- * Background sync against real market exchanges (OANDA, Binance, Live FX Rates & Yahoo Indices)
+ * Background sync against real market exchanges (OANDA v20, Coinbase Institutional, Interbank Forex & Yahoo Indices)
  */
 async function syncExternalMarketAnchors(): Promise<void> {
   if (isFetchingExternal) return;
@@ -306,66 +216,57 @@ async function syncExternalMarketAnchors(): Promise<void> {
         }
       }
     } catch {
-      // Graceful fallback to Binance and open FX feeds
+      // Graceful fallback to real institutional feeds
     }
 
-    // 2. Fetch Binance 24/7 real live prices (BTC, ETH, Gold PAXG, EUR, GBP, AUD)
+    // 2. Fetch real live Bitcoin (BTCUSD) from Coinbase institutional REST ticker
     try {
-      const symbolsQuery = encodeURIComponent('["BTCUSDT","ETHUSDT","PAXGUSDT","EURUSDT","GBPUSDT","AUDUSDT"]');
-      const endpoints = [
-        `https://data-api.binance.vision/api/v3/ticker/24hr?symbols=${symbolsQuery}`,
-        `https://api.binance.com/api/v3/ticker/24hr?symbols=${symbolsQuery}`,
-      ];
+      const btcRes = await fetch('https://api.exchange.coinbase.com/products/BTC-USD/ticker', {
+        headers: { 'User-Agent': 'SMC-Alpha-Trader/1.0' },
+        signal: AbortSignal.timeout(2500),
+      });
 
-      for (const endpoint of endpoints) {
-        try {
-          const binanceRes = await fetch(endpoint, {
-            headers: { 'User-Agent': 'SMC-Alpha-Trader/1.0' },
-            signal: AbortSignal.timeout(2500),
-          });
+      if (btcRes.ok) {
+        const btcData = await btcRes.json();
+        const price = parseFloat(btcData.price);
+        const bid = parseFloat(btcData.bid);
+        const ask = parseFloat(btcData.ask);
 
-          if (binanceRes.ok) {
-            const data = await binanceRes.json();
-            if (Array.isArray(data)) {
-              for (const item of data) {
-                const lastPrice = parseFloat(item.lastPrice);
-                const highPrice = parseFloat(item.highPrice);
-                const lowPrice = parseFloat(item.lowPrice);
-                const priceChange = parseFloat(item.priceChange);
-                const priceChangePercent = parseFloat(item.priceChangePercent);
-
-                if (item.symbol === 'BTCUSDT') {
-                  anchorPrices.BTCUSD = lastPrice;
-                  priceCache.BTCUSD.high24h = highPrice;
-                  priceCache.BTCUSD.low24h = lowPrice;
-                  priceCache.BTCUSD.change24h = priceChange;
-                  priceCache.BTCUSD.change24hPercent = priceChangePercent;
-                } else if (item.symbol === 'ETHUSDT') {
-                  anchorPrices.ETHUSD = lastPrice;
-                  priceCache.ETHUSD.high24h = highPrice;
-                  priceCache.ETHUSD.low24h = lowPrice;
-                  priceCache.ETHUSD.change24h = priceChange;
-                  priceCache.ETHUSD.change24hPercent = priceChangePercent;
-                } else if (item.symbol === 'PAXGUSDT') {
-                  anchorPrices.XAUUSD = lastPrice;
-                  priceCache.XAUUSD.high24h = highPrice;
-                  priceCache.XAUUSD.low24h = lowPrice;
-                  priceCache.XAUUSD.change24h = priceChange;
-                  priceCache.XAUUSD.change24hPercent = priceChangePercent;
-                }
-              }
-              break; // Successfully updated from live endpoint
-            }
-          }
-        } catch {
-          // Try next mirror
+        if (price > 0) {
+          anchorPrices.BTCUSD = price;
+          priceCache.BTCUSD.price = price;
+          priceCache.BTCUSD.bid = bid || price - 5;
+          priceCache.BTCUSD.ask = ask || price + 5;
+          priceCache.BTCUSD.high24h = Math.max(priceCache.BTCUSD.high24h, price);
+          priceCache.BTCUSD.low24h = Math.min(priceCache.BTCUSD.low24h, price);
         }
       }
     } catch {
-      // Binance tick sync silent fallback
+      // Coinbase tick silent fallback
     }
 
-    // 3. Fetch real live Interbank Forex Rates for USD pairs
+    // 3. Fetch Gold Spot (XAUUSD) benchmark quote from Comex / Live Metals
+    try {
+      const goldRes = await fetch('https://query1.finance.yahoo.com/v8/finance/chart/GC=F?range=1d&interval=1d', {
+        headers: { 'User-Agent': 'Mozilla/5.0' },
+        signal: AbortSignal.timeout(2500),
+      });
+      if (goldRes.ok) {
+        const goldData = await goldRes.json();
+        const regularPrice = goldData?.chart?.result?.[0]?.meta?.regularMarketPrice;
+        if (regularPrice && typeof regularPrice === 'number') {
+          const formatted = parseFloat(regularPrice.toFixed(2));
+          anchorPrices.XAUUSD = formatted;
+          priceCache.XAUUSD.price = formatted;
+          priceCache.XAUUSD.bid = parseFloat((formatted - 0.25).toFixed(2));
+          priceCache.XAUUSD.ask = parseFloat((formatted + 0.25).toFixed(2));
+        }
+      }
+    } catch {
+      // Gold benchmark fallback
+    }
+
+    // 4. Fetch real live Interbank Forex Rates for GBPUSD and USDJPY
     try {
       const fxRes = await fetch('https://open.er-api.com/v6/latest/USD', {
         signal: AbortSignal.timeout(3000),
@@ -378,36 +279,15 @@ async function syncExternalMarketAnchors(): Promise<void> {
             const jpyRate = parseFloat(Number(rates.JPY).toFixed(3));
             anchorPrices.USDJPY = jpyRate;
             priceCache.USDJPY.price = jpyRate;
-          }
-          if (rates.CAD) {
-            const cadRate = parseFloat(Number(rates.CAD).toFixed(4));
-            anchorPrices.USDCAD = cadRate;
-            priceCache.USDCAD.price = cadRate;
-          }
-          if (rates.CHF) {
-            const chfRate = parseFloat(Number(rates.CHF).toFixed(4));
-            anchorPrices.USDCHF = chfRate;
-            priceCache.USDCHF.price = chfRate;
-          }
-          if (rates.EUR) {
-            const eurRate = parseFloat((1 / rates.EUR).toFixed(4));
-            anchorPrices.EURUSD = eurRate;
-            priceCache.EURUSD.price = eurRate;
+            priceCache.USDJPY.bid = parseFloat((jpyRate - 0.015).toFixed(3));
+            priceCache.USDJPY.ask = parseFloat((jpyRate + 0.015).toFixed(3));
           }
           if (rates.GBP) {
-            const gbpRate = parseFloat((1 / rates.GBP).toFixed(4));
+            const gbpRate = parseFloat((1 / rates.GBP).toFixed(5));
             anchorPrices.GBPUSD = gbpRate;
             priceCache.GBPUSD.price = gbpRate;
-          }
-          if (rates.AUD) {
-            const audRate = parseFloat((1 / rates.AUD).toFixed(4));
-            anchorPrices.AUDUSD = audRate;
-            priceCache.AUDUSD.price = audRate;
-          }
-          if (rates.NZD) {
-            const nzdRate = parseFloat((1 / rates.NZD).toFixed(4));
-            anchorPrices.NZDUSD = nzdRate;
-            priceCache.NZDUSD.price = nzdRate;
+            priceCache.GBPUSD.bid = parseFloat((gbpRate - 0.00015).toFixed(5));
+            priceCache.GBPUSD.ask = parseFloat((gbpRate + 0.00015).toFixed(5));
           }
         }
       }
@@ -415,7 +295,7 @@ async function syncExternalMarketAnchors(): Promise<void> {
       // Forex rate fallback
     }
 
-    // 4. Fetch NASDAQ 100 benchmark quote
+    // 5. Fetch NASDAQ 100 benchmark quote (^NDX)
     try {
       const nasRes = await fetch('https://query1.finance.yahoo.com/v8/finance/chart/^NDX?range=1d&interval=1d', {
         headers: { 'User-Agent': 'Mozilla/5.0' },
@@ -428,6 +308,8 @@ async function syncExternalMarketAnchors(): Promise<void> {
           const formatted = parseFloat(regularPrice.toFixed(2));
           anchorPrices.NAS100 = formatted;
           priceCache.NAS100.price = formatted;
+          priceCache.NAS100.bid = parseFloat((formatted - 1.0).toFixed(2));
+          priceCache.NAS100.ask = parseFloat((formatted + 1.0).toFixed(2));
         }
       }
     } catch {
@@ -441,7 +323,7 @@ async function syncExternalMarketAnchors(): Promise<void> {
 }
 
 /**
- * Fetch real live market prices from OANDA / MT5 / Binance high-speed tick feed
+ * Fetch real live market prices from OANDA / MT5 / TradingView high-speed tick feed
  * Delivers instant tick updates on every call (250ms cadence)
  */
 export async function updateRealMarketPrices(): Promise<Record<MarketSymbol, MarketPriceData>> {
@@ -543,91 +425,121 @@ export async function getSymbolCandles(symbol: MarketSymbol, interval: string = 
     // Proceed to exchange fallback
   }
 
-  // 2. Fetch exchange klines via multi-endpoint mirrors (Binance Vision + Binance API + Coinbase)
+  // 2. Fetch real candles via institutional endpoints (Coinbase for BTCUSD, Yahoo Finance for Metals, Forex, Indices)
   try {
-    let binanceSymbol: string | null = null;
-    if (symbol === 'BTCUSD') binanceSymbol = 'BTCUSDT';
-    else if (symbol === 'ETHUSD') binanceSymbol = 'ETHUSDT';
-    else if (symbol === 'XAUUSD') binanceSymbol = 'PAXGUSDT';
-    else if (symbol === 'EURUSD') binanceSymbol = 'EURUSDT';
-    else if (symbol === 'GBPUSD') binanceSymbol = 'GBPUSDT';
-    else if (symbol === 'AUDUSD') binanceSymbol = 'AUDUSDT';
-
-    if (binanceSymbol) {
-      let mappedInterval = '15m';
+    if (symbol === 'BTCUSD') {
+      let granularity = 900;
       let needAggregation = 1;
+      if (interval === '1m') granularity = 60;
+      else if (interval === '2m') { granularity = 60; needAggregation = 2; }
+      else if (interval === '3m') { granularity = 60; needAggregation = 3; }
+      else if (interval === '5m') granularity = 300;
+      else if (interval === '15m') granularity = 900;
+      else if (interval === '30m') { granularity = 900; needAggregation = 2; }
+      else if (interval === '45m') { granularity = 900; needAggregation = 3; }
+      else if (interval === '1h') granularity = 3600;
+      else if (interval === '2h') { granularity = 3600; needAggregation = 2; }
+      else if (interval === '4h') granularity = 21600;
+      else if (interval === '1D') granularity = 86400;
+      else if (interval === '1W') { granularity = 86400; needAggregation = 7; }
+      else if (interval === '1M') { granularity = 86400; needAggregation = 30; }
 
-      if (interval === '1m') {
-        mappedInterval = '1m';
-      } else if (interval === '2m') {
-        mappedInterval = '1m';
-        needAggregation = 2;
-      } else if (interval === '3m') {
-        mappedInterval = '3m';
-      } else if (interval === '5m') {
-        mappedInterval = '5m';
-      } else if (interval === '15m') {
-        mappedInterval = '15m';
-      } else if (interval === '30m') {
-        mappedInterval = '30m';
-      } else if (interval === '45m') {
-        mappedInterval = '15m';
-        needAggregation = 3;
-      } else if (interval === '1h') {
-        mappedInterval = '1h';
-      } else if (interval === '2h') {
-        mappedInterval = '2h';
-      } else if (interval === '4h') {
-        mappedInterval = '4h';
-      } else if (interval === '1D') {
-        mappedInterval = '1d';
-      } else if (interval === '1W') {
-        mappedInterval = '1w';
-      } else if (interval === '1M') {
-        mappedInterval = '1M';
+      const cbRes = await fetch(
+        `https://api.exchange.coinbase.com/products/BTC-USD/candles?granularity=${granularity}`,
+        {
+          headers: { 'User-Agent': 'SMC-Alpha-Trader/1.0' },
+          signal: AbortSignal.timeout(3000),
+        }
+      );
+      if (cbRes.ok) {
+        const raw = await cbRes.json();
+        if (Array.isArray(raw) && raw.length > 0) {
+          // Coinbase returns newest first: [time, low, high, open, close, volume]
+          let candles: CandleData[] = raw
+            .slice()
+            .reverse()
+            .map((c: any) => ({
+              time: c[0],
+              open: parseFloat(c[3]),
+              high: parseFloat(c[2]),
+              low: parseFloat(c[1]),
+              close: parseFloat(c[4]),
+              volume: parseFloat(c[5]) || 100,
+            }));
+
+          if (needAggregation > 1) {
+            candles = aggregateCandles(candles, needAggregation);
+          }
+
+          if (candles.length > 0) {
+            candleCache[cacheKey] = candles;
+            return candles;
+          }
+        }
       }
+    } else {
+      // Traditional assets (XAUUSD, GBPUSD, NAS100, USDJPY) via Yahoo Finance
+      const yahooSymbolMap: Record<MarketSymbol, string> = {
+        BTCUSD: 'BTC-USD',
+        XAUUSD: 'GC=F',
+        GBPUSD: 'GBPUSD=X',
+        NAS100: '^NDX',
+        USDJPY: 'JPY=X',
+      };
 
-      const limit = needAggregation > 1 ? 120 : 100;
-      const endpoints = [
-        `https://data-api.binance.vision/api/v3/klines?symbol=${binanceSymbol}&interval=${mappedInterval}&limit=${limit}`,
-        `https://api.binance.com/api/v3/klines?symbol=${binanceSymbol}&interval=${mappedInterval}&limit=${limit}`,
-      ];
+      const ySymbol = yahooSymbolMap[symbol];
+      if (ySymbol) {
+        let yInterval = '15m';
+        let yRange = '5d';
+        if (interval === '1m') { yInterval = '1m'; yRange = '1d'; }
+        else if (interval === '2m') { yInterval = '2m'; yRange = '1d'; }
+        else if (interval === '5m') { yInterval = '5m'; yRange = '1d'; }
+        else if (interval === '15m') { yInterval = '15m'; yRange = '5d'; }
+        else if (interval === '30m') { yInterval = '30m'; yRange = '5d'; }
+        else if (interval === '1h') { yInterval = '60m'; yRange = '1mo'; }
+        else if (interval === '1D') { yInterval = '1d'; yRange = '3mo'; }
+        else if (interval === '1W') { yInterval = '1wk'; yRange = '1y'; }
+        else if (interval === '1M') { yInterval = '1mo'; yRange = '2y'; }
 
-      let raw: any[] | null = null;
-      for (const endpoint of endpoints) {
-        try {
-          const res = await fetch(endpoint, {
-            headers: { 'User-Agent': 'SMC-Alpha-Trader/1.0' },
-            signal: AbortSignal.timeout(2500),
-          });
-          if (res.ok) {
-            const data = await res.json();
-            if (Array.isArray(data) && data.length > 0) {
-              raw = data;
-              break;
+        const yRes = await fetch(
+          `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(ySymbol)}?range=${yRange}&interval=${yInterval}`,
+          {
+            headers: { 'User-Agent': 'Mozilla/5.0' },
+            signal: AbortSignal.timeout(3000),
+          }
+        );
+        if (yRes.ok) {
+          const yData = await yRes.json();
+          const result = yData?.chart?.result?.[0];
+          if (result && Array.isArray(result.timestamp)) {
+            const timestamps: number[] = result.timestamp;
+            const quotes = result.indicators?.quote?.[0];
+            if (quotes && Array.isArray(quotes.open)) {
+              const candles: CandleData[] = [];
+              for (let i = 0; i < timestamps.length; i++) {
+                const o = quotes.open[i];
+                const h = quotes.high[i];
+                const l = quotes.low[i];
+                const c = quotes.close[i];
+                const v = quotes.volume ? quotes.volume[i] : 100;
+                if (o != null && h != null && l != null && c != null) {
+                  candles.push({
+                    time: timestamps[i],
+                    open: parseFloat(o.toFixed(symbol === 'GBPUSD' ? 5 : symbol === 'USDJPY' ? 3 : 2)),
+                    high: parseFloat(h.toFixed(symbol === 'GBPUSD' ? 5 : symbol === 'USDJPY' ? 3 : 2)),
+                    low: parseFloat(l.toFixed(symbol === 'GBPUSD' ? 5 : symbol === 'USDJPY' ? 3 : 2)),
+                    close: parseFloat(c.toFixed(symbol === 'GBPUSD' ? 5 : symbol === 'USDJPY' ? 3 : 2)),
+                    volume: v || 100,
+                  });
+                }
+              }
+              if (candles.length > 0) {
+                candleCache[cacheKey] = candles;
+                return candles;
+              }
             }
           }
-        } catch {
-          // Quietly try next endpoint
         }
-      }
-
-      if (Array.isArray(raw)) {
-        let candles: CandleData[] = raw.map((c: any) => ({
-          time: Math.floor(c[0] / 1000),
-          open: parseFloat(c[1]),
-          high: parseFloat(c[2]),
-          low: parseFloat(c[3]),
-          close: parseFloat(c[4]),
-          volume: parseFloat(c[5]) || 100,
-        }));
-
-        if (needAggregation > 1) {
-          candles = aggregateCandles(candles, needAggregation);
-        }
-
-        candleCache[cacheKey] = candles;
-        return candles;
       }
     }
   } catch {

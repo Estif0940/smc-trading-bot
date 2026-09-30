@@ -97,7 +97,7 @@ export const TradeHistoryTable: React.FC<TradeHistoryTableProps> = ({ history, s
               history.map((trade) => {
                 const isLong = trade.direction === 'LONG';
                 const isWin = trade.outcome === 'WIN';
-                const isForex = trade.symbol === 'EURUSD' || trade.symbol === 'GBPUSD';
+                const isForex = trade.symbol === 'GBPUSD';
                 const formatP = (p?: number) => (p === undefined ? '-' : isForex ? p.toFixed(4) : trade.symbol === 'XAUUSD' ? p.toFixed(2) : p.toFixed(2));
 
                 return (
